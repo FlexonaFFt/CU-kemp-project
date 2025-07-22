@@ -1,7 +1,5 @@
 from uuid import UUID
-
 from pydantic import UUID4, BaseModel, StrictStr
-
 
 class CustomBaseModel(BaseModel):
     def model_dump(self, *args, **kwargs):

@@ -433,6 +433,22 @@ test-full = ["adlfs", "aiohttp (!=4.0.0a0,!=4.0.0a1)", "cloudpickle", "dask", "d
 tqdm = ["tqdm"]
 
 [[package]]
+name = "gigachat"
+version = "0.1.41.post1"
+description = "GigaChat. Python-library for GigaChain and LangChain"
+optional = false
+python-versions = "<4.0,>=3.8"
+groups = ["main"]
+files = [
+    {file = "gigachat-0.1.41.post1-py3-none-any.whl", hash = "sha256:0358e6d1c6016aa5250a4ce3773658cb0574246273be688bcb6341b293bf0a8c"},
+    {file = "gigachat-0.1.41.post1.tar.gz", hash = "sha256:75bea47b636a0a80d19831451563925eb8213be70fc12c4bef6158abc9d17b74"},
+]
+
+[package.dependencies]
+httpx = "<1"
+pydantic = ">=1"
+
+[[package]]
 name = "gitdb"
 version = "4.0.12"
 description = "Git Object Database"
@@ -3274,5 +3290,5 @@ files = [
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.10"
-content-hash = "85cb7a463828e4f4a4381d9e6a27f5a338c2475185aba3aeef29ebcb0684139c"
+python-versions = ">=3.10,<4.0"
+content-hash = "6aa39df97d4554f57f05d0f68dca3e7d8693b4e11722eea4b9ff5c40b89978f4"
