@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 
 from app.core.logging import app_logger
+from app.ml.model import get_model_response
 from app.models import GetMessageRequestModel, GetMessageResponseModel, IncomingMessage, Prediction
 from random import random
 from uuid import uuid4
@@ -24,11 +25,12 @@ async def get_message(body: GetMessageRequestModel):
                 dialog_id (str): ID диалога
     """
 
+    model_response = get_model_response(body.last_msg_text)
     app_logger.info(
         f"Received message dialog_id: {body.dialog_id}, last_msg_id: {body.last_message_id}"
     )
     return GetMessageResponseModel(
-        new_msg_text=body.last_msg_text, dialog_id=body.dialog_id
+        new_msg_text=model_response, dialog_id=body.dialog_id
     )
 
 @app.post("/predict", response_model=Prediction)
@@ -40,7 +42,7 @@ def predict(msg: IncomingMessage) -> Prediction:
     Returns a `Prediction` object.
     """
 
-    is_bot_probability = random()  # Simulate a probability for the sake of example
+    is_bot_probability = random()  # Simulate
     prediction_id = uuid4()
 
     return Prediction(
