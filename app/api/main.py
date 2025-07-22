@@ -1,5 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from app.core.logging import setup_clean_environment
+setup_clean_environment()
 
+from fastapi import FastAPI, HTTPException
 from app.core.logging import app_logger
 from app.ml.model import get_model_response
 from app.models import GetMessageRequestModel, GetMessageResponseModel, IncomingMessage, Prediction

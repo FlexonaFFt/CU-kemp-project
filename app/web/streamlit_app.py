@@ -1,8 +1,9 @@
-from uuid import uuid4
+from app.core.logging import setup_clean_environment
+setup_clean_environment()
 
+from uuid import uuid4
 import requests
 import streamlit as st
-
 from app.models import GetMessageRequestModel
 
 default_echo_bot_url = "http://localhost:6872"

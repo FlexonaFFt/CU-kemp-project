@@ -1,4 +1,6 @@
 import logging
+import warnings
+import os
 
 
 class CustomFormatter(logging.Formatter):
@@ -23,7 +25,34 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
-def setup_logging(level: int = logging.INFO):
+def suppress_warnings():
+    # Подавляет FutureWarning от transformers
+    warnings.filterwarnings("ignore", category=FutureWarning, module="transformers")
+    
+    # Подавляет UserWarning от torch о NumPy
+    warnings.filterwarnings("ignore", category=UserWarning, module="torch")
+    
+    # Подавляет urllib3 warnings
+    warnings.filterwarnings("ignore", module="urllib3")
+    
+    # Альтернативно, можно полностью отключить все warnings
+    # warnings.filterwarnings("ignore")
+
+
+def setup_clean_environment():
+    # Устанавливает переменные окружения для подавления warnings
+    os.environ["PYTHONWARNINGS"] = "ignore"
+    os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+    
+    # Подавляет warnings
+    suppress_warnings()
+
+
+def setup_logging(level: int = logging.INFO, clean_env: bool = True):
+    """Настраивает логирование с опциональным подавлением warnings"""
+    if clean_env:
+        setup_clean_environment()
+    
     root_logger = logging.getLogger()
     root_logger.setLevel(level)
 
