@@ -9,8 +9,8 @@ from app.models import GetMessageRequestModel
 default_echo_bot_url = "http://localhost:6872"
 st.set_page_config(initial_sidebar_state="collapsed")
 
-st.markdown("# Echo bot 🚀")
-st.sidebar.markdown("# Echo bot 🚀")
+st.markdown("# Botan-s-Rostova")
+st.sidebar.markdown("# Botan-s-Rostova")
 
 if "dialog_id" not in st.session_state:
     st.session_state.dialog_id = str(uuid4())
@@ -26,7 +26,17 @@ with st.sidebar:
 
     dialog_id = st.text_input("Dialog id", key="dialog_id", disabled=True)
 
-if "messages" not in st.session_state:
+if "dialog_id" in st.session_state:
+    response = requests.get(f"{echo_bot_url}/get_history", params={"dialog_id": st.session_state.dialog_id})
+    if response.status_code == 200:
+        history = response.json()
+        st.session_state["messages"] = []
+        for msg in history:
+            role = "assistant" if msg["new_msg_text"] else "user"
+            st.session_state["messages"].append({"role": role, "content": msg["new_msg_text"]})
+    else:
+        st.session_state["messages"] = [{"role": "assistant", "content": "Type something"}]
+else:
     st.session_state["messages"] = [{"role": "assistant", "content": "Type something"}]
 
 for msg in st.session_state["messages"]:
