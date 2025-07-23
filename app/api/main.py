@@ -52,10 +52,11 @@ async def get_history(dialog_id: str, db: Session = Depends(get_db)):
     return [GetMessageResponseModel(new_msg_text=msg.content, dialog_id=msg.dialog_id) for msg in messages]
 
 def get_bot_probability(text: str) -> float:
+    clf = joblib.load("app/ml/human_bot_classifier.joblib")
+    vectorizer = joblib.load("app/ml/vectorizer.joblib")
     vec = vectorizer.transform([text])
     probas = clf.predict_proba(vec)[0]
     return float(probas[0])  
-
 
 @app.post("/predict", response_model=Prediction)
 def predict(msg: IncomingMessage) -> Prediction:

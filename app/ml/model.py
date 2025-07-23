@@ -36,6 +36,7 @@ langchain_messages = [
 ]
 
 def get_gigachat_langchain_response(text: str) -> str:
+    time.sleep(random.uniform(2, 5))
     langchain_messages.append(HumanMessage(content=text))
     res = langchain_giga.invoke(langchain_messages)
     langchain_messages.append(res)
