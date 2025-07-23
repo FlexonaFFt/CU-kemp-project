@@ -10,7 +10,8 @@ dependencies = [
     "streamlit (==1.43.1)",
     "transformers (==4.35.0)",
     "torch (>=2.7.1,<3.0.0)", "numpy",
-    "gigachat", "sqlalchemy", "langchain-gigachat"
+    "gigachat", "sqlalchemy", "langchain-gigachat",
+    "joblib"
 ]
 
 

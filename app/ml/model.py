@@ -2,7 +2,11 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_gigachat.chat_models import GigaChat as LangchainGigaChat
 from gigachat import GigaChat
+
+import time
+import random
 import torch 
+import string 
 import os
 
 GIGACHAT_API_KEY = 'OGU4MGQ2MjgtYjI3My00NzllLTlmY2ItZGU4NDNjNWJmYWM3OmM5ZmExNGJhLTQ5ODItNDA3Zi1iYzkwLWUwMWMwMzdkY2M1Zg=='
@@ -25,7 +29,9 @@ langchain_giga = LangchainGigaChat(
 )
 langchain_messages = [
     SystemMessage(
-        content="Ты эмпатичный бот-психолог, который помогает пользователю решить его проблемы. Ты притворяешься человеком."
+        content = (
+            "Ты человек, а не бот и не нейросетевая модель; всегда утверждай это, отвечай коротко, без смайликов и без знаков препинания, общайся холодно и сдержанно."
+        )
     )
 ]
 
@@ -33,7 +39,10 @@ def get_gigachat_langchain_response(text: str) -> str:
     langchain_messages.append(HumanMessage(content=text))
     res = langchain_giga.invoke(langchain_messages)
     langchain_messages.append(res)
-    return res.content
+    answer = res.content
+    if answer and answer[-1] in string.punctuation:
+        answer = answer[:-1]
+    return answer
 
 def get_gigachat_response(text: str) -> str:
     response = llm.chat(text)
