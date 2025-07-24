@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from app.core.logging import app_logger
 from app.ml.model import get_model_response, ensemble_predict_mod
 from app.models import GetMessageRequestModel, GetMessageResponseModel, IncomingMessage, Prediction
+from app.core.prediction_database import SessionPrediction, PredictionData
 from random import random
 from uuid import uuid4
 from sqlalchemy.orm import Session 
@@ -61,7 +62,20 @@ def get_bot_probability(text: str) -> float:
 @app.post("/predict", response_model=Prediction)
 def predict(msg: IncomingMessage) -> Prediction:
     is_bot_probability = ensemble_predict_mod(msg.text)
-    prediction_id = uuid4()
+    prediction_id = str(uuid4())
+
+    db_pred = SessionPrediction()
+    prediction_record = PredictionData(
+        id=prediction_id,
+        message_id=str(msg.id),
+        dialog_id=str(msg.dialog_id),
+        participant_index=msg.participant_index,
+        is_bot_probability=is_bot_probability
+    )
+    db_pred.add(prediction_record)
+    db_pred.commit()
+    db_pred.close()
+
     return Prediction(
         id=prediction_id,
         message_id=msg.id,
