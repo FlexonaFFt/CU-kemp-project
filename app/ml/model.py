@@ -69,7 +69,7 @@ def llm_predict_1(text: str) -> int:
     prompt = propmt + prompt_after
 
     messages = [SystemMessage(content=prompt)]
-    time.sleep(1)
+    #time.sleep(1)
     res = langchain_giga.invoke(messages)
     answer = res.content.strip()
     for c in answer:
@@ -88,7 +88,7 @@ def llm_predict_2(text: str) -> int:
         "Ответь только одной цифрой: 1 если бот, 0 если человек."
     )
     messages = [SystemMessage(content=prompt)]
-    time.sleep(1)
+    #time.sleep(1)
     res = langchain_giga.invoke(messages)
     answer = res.content.strip()
     for c in answer:
@@ -109,7 +109,7 @@ def get_bot_probability_ensemble(text: str, weights=None) -> float:
         prob = np.average(preds, weights=weights)
     return float(prob)
 
-def ensemble_predict_mod(text: str, threshold=0.5, weights=None) -> int:
+def ensemble_predict_mod(text: str, threshold=0.35, weights=None) -> int:
     prob = get_bot_probability_ensemble(text, weights)
     return int(prob > threshold)
 

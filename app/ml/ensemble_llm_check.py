@@ -18,7 +18,7 @@ for idx, row in df.iterrows():
     pred_llm1 = llm_predict_1(text)
     pred_llm2 = llm_predict_2(text)
     ensemble_prob = get_bot_probability_ensemble(text)
-    ensemble_pred = int(ensemble_prob > 0.5)
+    ensemble_pred = int(ensemble_prob > 0.35)
     results.append({
         "id": row['id'],
         "text": text,
