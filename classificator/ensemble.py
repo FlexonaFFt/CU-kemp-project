@@ -44,7 +44,7 @@ def ml_model_rf(text: str) -> int:
     return int(clf_rf.predict(vec)[0])
 
 """Пишу ансамбль"""
-def ensemble_predict(text: str, weights=None) -> float:
+def ensemble_predict(text: str, threshold=0.3, weights=None) -> int:
     preds = [
         regex_rule_model(text),
         keyword_rule_model(text),
@@ -55,7 +55,7 @@ def ensemble_predict(text: str, weights=None) -> float:
         prob = np.mean(preds)
     else:
         prob = np.average(preds, weights=weights)
-    return float(prob) 
+    return int(prob > threshold)
 
-def get_bot_probability_ensemble(text: str) -> float:
+def get_bot_probability_ensemble(text: str) -> int:
     return ensemble_predict(text)

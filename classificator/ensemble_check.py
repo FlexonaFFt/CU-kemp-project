@@ -17,7 +17,7 @@ for idx, row in df.iterrows():
     lr_pred = ml_model_lr(text)
     rf_pred = ml_model_rf(text)
     ensemble_prob = ensemble_predict(text)
-    ensemble_pred = int(ensemble_prob > 0.5)
+    ensemble_pred = int(ensemble_prob > 0.4)
     results.append({
         "id": row['id'],
         "text": text,
