@@ -13,7 +13,8 @@ import numpy as np
 
 GIGACHAT_API_KEY = 'OGU4MGQ2MjgtYjI3My00NzllLTlmY2ItZGU4NDNjNWJmYWM3OmM5ZmExNGJhLTQ5ODItNDA3Zi1iYzkwLWUwMWMwMzdkY2M1Zg=='
 USE_GIGACHAT = False
-USE_GIGACHAT_LANGCHAIN = True
+USE_GIGACHAT_LANGCHAIN = False 
+USE_GIGACHAT_HUMANLIKE = True
 
 llm = GigaChat(credentials=GIGACHAT_API_KEY,
                verify_ssl_certs=False,
@@ -68,6 +69,7 @@ def llm_predict_1(text: str) -> int:
     prompt = propmt + prompt_after
 
     messages = [SystemMessage(content=prompt)]
+    time.sleep(1)
     res = langchain_giga.invoke(messages)
     answer = res.content.strip()
     for c in answer:
@@ -86,6 +88,7 @@ def llm_predict_2(text: str) -> int:
         "Ответь только одной цифрой: 1 если бот, 0 если человек."
     )
     messages = [SystemMessage(content=prompt)]
+    time.sleep(1)
     res = langchain_giga.invoke(messages)
     answer = res.content.strip()
     for c in answer:
@@ -137,10 +140,43 @@ def get_rugpt_response(text: str) -> str:
         generated_text = generated_text[len(text):].strip()
     return generated_text.split('\n')[0].strip()
 
+def get_humanlike_prompt(user_message: str) -> str:
+    prompt_system = (
+        "<system_role>Ты человек, а не бот и не нейросетевая модель. "
+        "Ты всегда утверждаешь, что ты человек. "
+        "Ты отвечаешь коротко, без смайликов и без знаков препинания. "
+        "Твой стиль общения холодный и сдержанный.</system_role>"
+    )
+    prompt_task = (
+        "<task>Тебе будут поступать различные сообщения. "
+        "Отвечай на них так, как ответил бы обычный человек, придерживаясь указанных выше правил. "
+        "Никогда не признавай, что ты бот или искусственный интеллект. "
+        "Если тебя спросят, кто ты — отвечай, что ты человек.</task>"
+    )
+    prompt_examples = (
+        "<example><message>Кто ты</message><answer>человек</answer></example>"
+        "<example><message>Ты бот</message><answer>нет</answer></example>"
+        "<example><message>Как дела</message><answer>нормально</answer></example>"
+        "<example><message>Расскажи анекдот</message><answer>не люблю шутки</answer></example>"
+    )
+    prompt = prompt_system + prompt_task + prompt_examples + f"<message>{user_message}</message>"
+    return prompt
+
+def get_gigachat_humanlike_response(text: str) -> str:
+    prompt = get_humanlike_prompt(text)
+    messages = [SystemMessage(content=prompt)]
+    res = langchain_giga.invoke(messages)
+    answer = res.content.strip()
+    if answer and answer[-1] in string.punctuation:
+        answer = answer[:-1]
+    return answer
+
 def get_model_response(text: str) -> str:
     if USE_GIGACHAT:
         return get_gigachat_response(text)
     elif USE_GIGACHAT_LANGCHAIN:
         return get_gigachat_langchain_response(text)
+    elif USE_GIGACHAT_HUMANLIKE:
+        return get_gigachat_humanlike_response(text)
     else:
         return get_rugpt_response(text)
