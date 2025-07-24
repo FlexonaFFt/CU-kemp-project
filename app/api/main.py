@@ -4,6 +4,7 @@ setup_clean_environment()
 from fastapi import FastAPI, HTTPException, Depends 
 from app.core.logging import app_logger
 from app.ml.model import get_model_response
+from app.ml.ensemble_classifier import get_bot_probability_ensemble
 from app.models import GetMessageRequestModel, GetMessageResponseModel, IncomingMessage, Prediction
 from random import random
 from uuid import uuid4
@@ -66,7 +67,7 @@ def predict(msg: IncomingMessage) -> Prediction:
 
     Returns a `Prediction` object.
     """
-    is_bot_probability = get_bot_probability(msg.text)  
+    is_bot_probability = get_bot_probability_ensemble(msg.text)
     prediction_id = uuid4()
 
     return Prediction(
