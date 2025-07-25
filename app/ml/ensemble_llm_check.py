@@ -1,6 +1,6 @@
 import pandas as pd
 from sqlalchemy import create_engine
-from model import ml_model_lr, ml_model_rf, llm_predict_1, llm_predict_2, get_bot_probability_ensemble
+from model import llm_predict_1, llm_predict_2, llm_predict_punctuation, llm_predict_slang, get_bot_probability_ensemble
 
 engine = create_engine('sqlite:///../../chat_history.db')
 query = "SELECT id, role, content FROM messages"
@@ -13,20 +13,20 @@ results = []
 for idx, row in df.iterrows():
     text = row['content']
     label = row['label']
-    pred_lr = ml_model_lr(text)
-    pred_rf = ml_model_rf(text)
     pred_llm1 = llm_predict_1(text)
     pred_llm2 = llm_predict_2(text)
+    pred_punct = llm_predict_punctuation(text)
+    pred_slang = llm_predict_slang(text)
     ensemble_prob = get_bot_probability_ensemble(text)
     ensemble_pred = int(ensemble_prob > 0.35)
     results.append({
         "id": row['id'],
         "text": text,
         "label": label,
-        "ml_lr": pred_lr,
-        "ml_rf": pred_rf,
         "llm1": pred_llm1,
         "llm2": pred_llm2,
+        "punctuation": pred_punct,
+        "slang": pred_slang,
         "ensemble_prob": ensemble_prob,
         "ensemble_pred": ensemble_pred
     })

@@ -38,16 +38,6 @@ langchain_messages = [
     )
 ]
 
-# --- ML КЛАССИФИКАТОРЫ ---
-MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
-VECTORIZER_PATH = os.path.join(MODEL_DIR, "vectorizer.joblib")
-MODEL_LR_PATH = os.path.join(MODEL_DIR, "human_bot_classifier.joblib")
-MODEL_RF_PATH = os.path.join(MODEL_DIR, "human_bot_classifier_rf.joblib")
-
-vectorizer = joblib.load(VECTORIZER_PATH)
-clf_lr = joblib.load(MODEL_LR_PATH)
-clf_rf = joblib.load(MODEL_RF_PATH)
-
 def ml_model_lr(text: str) -> int:
     vec = vectorizer.transform([text])
     return int(clf_lr.predict(vec)[0])
@@ -96,12 +86,48 @@ def llm_predict_2(text: str) -> int:
             return int(c)
     return 0
 
+def llm_predict_punctuation(text: str) -> int:
+    prompt = (
+        "<system_role>Ты эксперт по анализу текста с акцентом на знаки препинания. "
+        "Определи, написано ли сообщение человеком или ботом, основываясь на использовании знаков препинания. "
+        "Ответь 1, если бот, 0 если человек.</system_role>"
+        "<task>Проанализируй сообщение и ответь одной цифрой: 1 или 0.</task>"
+        f"<message>{text}</message>"
+        "Ответь только цифрой 1 или 0."
+    )
+    messages = [SystemMessage(content=prompt)]
+    #time.sleep(1)
+    res = langchain_giga.invoke(messages)
+    answer = res.content.strip()
+    for c in answer:
+        if c in "01":
+            return int(c)
+    return 0
+
+def llm_predict_slang(text: str) -> int:
+    prompt = (
+        "<system_role>Ты эксперт по выявлению сленга и неформального языка в тексте. "
+        "Определи, написал ли сообщение человек или бот, основываясь на использовании сленга. "
+        "Ответь 1, если бот, 0 если человек.</system_role>"
+        "<task>Проанализируй сообщение и ответь одной цифрой: 1 или 0.</task>"
+        f"<message>{text}</message>"
+        "Ответь только цифрой 1 или 0."
+    )
+    messages = [SystemMessage(content=prompt)]
+    #time.sleep(1)
+    res = langchain_giga.invoke(messages)
+    answer = res.content.strip()
+    for c in answer:
+        if c in "01":
+            return int(c)
+    return 0
+
 def get_bot_probability_ensemble(text: str, weights=None) -> float:
     preds = [
         llm_predict_1(text),
         llm_predict_2(text),
-        ml_model_lr(text),
-        ml_model_rf(text)
+        llm_predict_punctuation(text),
+        llm_predict_slang(text)
     ]
     if weights is None:
         prob = np.mean(preds)
@@ -109,7 +135,7 @@ def get_bot_probability_ensemble(text: str, weights=None) -> float:
         prob = np.average(preds, weights=weights)
     return float(prob)
 
-def ensemble_predict_mod(text: str, threshold=0.35, weights=None) -> int:
+def ensemble_predict_mod(text: str, threshold=0.5, weights=None) -> int:
     prob = get_bot_probability_ensemble(text, weights)
     return int(prob > threshold)
 
